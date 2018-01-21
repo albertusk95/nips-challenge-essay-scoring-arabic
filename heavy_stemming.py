@@ -227,4 +227,8 @@ for student_ans_word_idx in range(len(list_of_student_ans_words_no_stops_pref_su
 
 				break
 
-print 'Final Mark: {0}'.format(finalMark)
+
+print '\n'
+print 'HEAVY STEMMING APPROACH'
+print '-----------------------'
+print 'Final Mark (%): {0} ({1} %)'.format(finalMark, finalMark * 100)

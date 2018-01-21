@@ -77,21 +77,10 @@ with open(DATASET + '/student_ans') as f:
 student_ans_no_nums = ''.join([i for i in student_ans_text if not i.isdigit()])
 correct_ans_no_nums = ''.join([i for i in correct_ans_text if not i.isdigit()])
 
-# [2] Removal of diacritics from both answers
-
-# Convert each answer to unicode
-student_ans_no_nums_to_unicode = student_ans_no_nums.decode('utf-8')
-correct_ans_no_nums_to_unicode = correct_ans_no_nums.decode('utf-8')
-
-# Remove diacritics from both answers
-student_ans_no_nums_diacritics = unidecode.unidecode(student_ans_no_nums_to_unicode)
-correct_ans_no_nums_diacritics = unidecode.unidecode(correct_ans_no_nums_to_unicode)
-
-
 # Split each one of the two anwers into an array of words, processing one word at a time
 
-list_of_student_ans_words = student_ans_no_nums_diacritics.translate(None, punctuation).lower().split()
-list_of_correct_ans_words = correct_ans_no_nums_diacritics.translate(None, punctuation).lower().split()
+list_of_student_ans_words = student_ans_no_nums.translate(None, punctuation).lower().split()
+list_of_correct_ans_words = correct_ans_no_nums.translate(None, punctuation).lower().split()
 
 # [1] Removal of stopwords
 
@@ -100,51 +89,30 @@ list_of_correct_ans_words_no_stops = removeStopwords(list_of_correct_ans_words)
 
 # [4] Remove prefix if word length is greater than 3, else skip this step
 
-list_of_student_ans_words_no_stops_pref = []
-list_of_correct_ans_words_no_stops_pref = []
+list_of_student_ans_words_no_stops_suf = []
+list_of_correct_ans_words_no_stops_suf = []
 
 for student_ans_word in list_of_student_ans_words_no_stops:
 	new_word = student_ans_word
 
 	if len(student_ans_word) > 3:
-		new_word = removePrefix(student_ans_word)
+		new_word = removeSuffix(student_ans_word)
 
-	list_of_student_ans_words_no_stops_pref.append(new_word)
+	list_of_student_ans_words_no_stops_suf.append(new_word)
 
 for correct_ans_word in list_of_correct_ans_words_no_stops:
 	new_word = correct_ans_word
 
 	if len(correct_ans_word) > 3:
-		new_word = removePrefix(correct_ans_word)
-
-	list_of_correct_ans_words_no_stops_pref.append(new_word)
-
-# [5] Remove suffix if word length is greater than 3, else skip this step
-
-list_of_student_ans_words_no_stops_pref_suf = []
-list_of_correct_ans_words_no_stops_pref_suf = []
-
-for student_ans_word in list_of_student_ans_words_no_stops_pref:
-	new_word = student_ans_word
-
-	if len(student_ans_word) > 3:
-		new_word = removeSuffix(student_ans_word)
-
-	list_of_student_ans_words_no_stops_pref_suf.append(new_word)
-
-for correct_ans_word in list_of_correct_ans_words_no_stops_pref:
-	new_word = correct_ans_word
-
-	if len(correct_ans_word) > 3:
 		new_word = removeSuffix(correct_ans_word)
 
-	list_of_correct_ans_words_no_stops_pref_suf.append(new_word)
+	list_of_correct_ans_words_no_stops_suf.append(new_word)
 
 
 # Find the similarities by giving a weight to each word in both answers
 # Formula: Word(i) weight = 1 / (total words in correct answer)
 
-wordWeight = 1 / len(list_of_correct_ans_words_no_stops_pref_suf)
+wordWeight = 1 / len(list_of_correct_ans_words_no_stops_suf)
 
 print '\n'
 print 'Word weight: {0}'.format(wordWeight)
@@ -155,10 +123,10 @@ print 'Word weight: {0}'.format(wordWeight)
 
 list_of_lev_distances = []
 
-for student_ans_word_idx in range(len(list_of_student_ans_words_no_stops_pref_suf)):
-	for correct_ans_word_idx in range(len(list_of_correct_ans_words_no_stops_pref_suf)):
-		student_ans_word = list_of_student_ans_words_no_stops_pref_suf[student_ans_word_idx]
-		correct_ans_word = list_of_correct_ans_words_no_stops_pref_suf[correct_ans_word_idx]
+for student_ans_word_idx in range(len(list_of_student_ans_words_no_stops_suf)):
+	for correct_ans_word_idx in range(len(list_of_correct_ans_words_no_stops_suf)):
+		student_ans_word = list_of_student_ans_words_no_stops_suf[student_ans_word_idx]
+		correct_ans_word = list_of_correct_ans_words_no_stops_suf[correct_ans_word_idx]
 
 		# Compute the Levenshtein distance between student answer word and correct answer word
 		levenshtein_distance = computeLevenshteinDistance(student_ans_word, correct_ans_word)
@@ -177,14 +145,14 @@ print list_of_lev_distances
 
 list_of_sim_score = []
 
-for student_ans_word_idx in range(len(list_of_student_ans_words_no_stops_pref_suf)):
-	for correct_ans_word_idx in range(len(list_of_correct_ans_words_no_stops_pref_suf)):
+for student_ans_word_idx in range(len(list_of_student_ans_words_no_stops_suf)):
+	for correct_ans_word_idx in range(len(list_of_correct_ans_words_no_stops_suf)):
 		
 		for lev_distance in list_of_lev_distances:
 			if lev_distance[0] == student_ans_word_idx and lev_distance[1] == correct_ans_word_idx:
 
-				student_ans_word = list_of_student_ans_words_no_stops_pref_suf[student_ans_word_idx]
-				correct_ans_word = list_of_correct_ans_words_no_stops_pref_suf[correct_ans_word_idx]
+				student_ans_word = list_of_student_ans_words_no_stops_suf[student_ans_word_idx]
+				correct_ans_word = list_of_correct_ans_words_no_stops_suf[correct_ans_word_idx]
 
 				# Compute the similarity score between student answer word and correct answer word
 				similarity_score = computeSimilarityScore(lev_distance[2], student_ans_word, correct_ans_word)
@@ -210,8 +178,8 @@ finalMark = 0
 # [3] Elseif the similarity between StudentWord(i) and CorrectWord(i) >= 0.8 and < 0.96, add half the weight to the final mark
 # [4] Elseif the similarity between StudentWord(i) and CorrectWord(i) < 0.8 then no weight is added to the final mark
 
-for student_ans_word_idx in range(len(list_of_student_ans_words_no_stops_pref_suf)):
-	for correct_ans_word_idx in range(len(list_of_correct_ans_words_no_stops_pref_suf)):
+for student_ans_word_idx in range(len(list_of_student_ans_words_no_stops_suf)):
+	for correct_ans_word_idx in range(len(list_of_correct_ans_words_no_stops_suf)):
 
 		for sim_score in list_of_sim_score:
 			if sim_score[0] == student_ans_word_idx and sim_score[1] == correct_ans_word_idx:
@@ -227,4 +195,7 @@ for student_ans_word_idx in range(len(list_of_student_ans_words_no_stops_pref_su
 
 				break
 
-print 'Final Mark: {0}'.format(finalMark)
+print '\n'
+print 'LIGHT STEMMING APPROACH'
+print '-----------------------'
+print 'Final Mark (%): {0} ({1} %)'.format(finalMark, finalMark * 100)
