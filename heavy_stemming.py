@@ -1,6 +1,7 @@
 
 # HEAVY STEMMING APPROACH
 
+from __future__ import division
 from string import punctuation
 import editdistance
 import unidecode
@@ -49,6 +50,13 @@ def removeSuffix(text):
 # Return the Levenshtein distance between two words
 def computeLevenshteinDistance(student_ans_word, correct_ans_word):
 	return editdistance.eval(student_ans_word, correct_ans_word)
+
+
+# Return the similarity score between two words
+def computeSimilarityScore(lev_distance, student_ans_word, correct_ans_word):
+	# Formula: S(s1, s2) = (1 - D(s1, s2)) / (max(L(s1), L(s2)))
+	# where L is the length of a given string
+	return (1 - lev_distance) / (max(len(student_ans_word), len(correct_ans_word)))
 
 
 # Get both question and correct answer from the database
@@ -153,10 +161,34 @@ for student_ans_word_idx in range(len(list_of_student_ans_words_no_stops_pref_su
 		# Compute the Levenshtein distance between student answer word and correct answer word
 		levenshtein_distance = computeLevenshteinDistance(student_ans_word, correct_ans_word)
 		
-		# Create the tuple specifying the index for the student and correct answer word as well as the Levenshtein distance
+		# Create a tuple specifying the index for the student and correct answer word as well as the Levenshtein distance
 		lev_distance_tuple = (student_ans_word_idx, correct_ans_word_idx, levenshtein_distance)
 
 		# Insert the tuple into a list
 		list_of_lev_distances.append(lev_distance_tuple)
+
+
+# [2] Calculate the similarity score between every word in student answer and words in correct answer
+
+list_of_sim_score = []
+
+for student_ans_word_idx in range(len(list_of_student_ans_words_no_stops_pref_suf)):
+	for correct_ans_word_idx in range(len(list_of_correct_ans_words_no_stops_pref_suf)):
+		
+		for lev_distance in list_of_lev_distances:
+			if lev_distance[0] == student_ans_word_idx and lev_distance[1] == correct_ans_word_idx:
+
+				student_ans_word = list_of_student_ans_words_no_stops_pref_suf[student_ans_word_idx]
+				correct_ans_word = list_of_correct_ans_words_no_stops_pref_suf[correct_ans_word_idx]
+
+				# Compute the similarity score between student answer word and correct answer word
+				similarity_score = computeSimilarityScore(lev_distance[2], student_ans_word, correct_ans_word)
+
+				# Create a tuple specifying the index for student and correct answer word as well as the similarity score
+				sim_score_tuple = (student_ans_word_idx, correct_ans_word_idx, similarity_score)
+
+				# Insert the tuple into a list
+				list_of_sim_score.append(sim_score_tuple)
+
 
 
