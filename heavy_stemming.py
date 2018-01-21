@@ -54,9 +54,9 @@ def computeLevenshteinDistance(student_ans_word, correct_ans_word):
 
 # Return the similarity score between two words
 def computeSimilarityScore(lev_distance, student_ans_word, correct_ans_word):
-	# Formula: S(s1, s2) = (1 - D(s1, s2)) / (max(L(s1), L(s2)))
+	# Formula: S(s1, s2) = 1 - (D(s1, s2) / (max(L(s1), L(s2))))
 	# where L is the length of a given string
-	return (1 - lev_distance) / (max(len(student_ans_word), len(correct_ans_word)))
+	return 1 - (lev_distance / (max(len(student_ans_word), len(correct_ans_word))))
 
 
 # Get both question and correct answer from the database
@@ -80,12 +80,12 @@ correct_ans_no_nums = ''.join([i for i in correct_ans_text if not i.isdigit()])
 # [2] Removal of diacritics from both answers
 
 # Convert each answer to unicode
-student_ans_no_nums_unicode = student_ans_no_nums_unicode.decode('utf-8')
-correct_ans_no_nums_unicode = correct_ans_no_nums_unicode.decode('utf-8')
+student_ans_no_nums_to_unicode = student_ans_no_nums.decode('utf-8')
+correct_ans_no_nums_to_unicode = correct_ans_no_nums.decode('utf-8')
 
 # Remove diacritics from both answers
-student_ans_no_nums_diacritics = unidecode.unidecode(student_ans_no_nums_unicode)
-correct_ans_no_nums_diacritics = unidecode.unidecode(correct_ans_no_nums_unicode)
+student_ans_no_nums_diacritics = unidecode.unidecode(student_ans_no_nums_to_unicode)
+correct_ans_no_nums_diacritics = unidecode.unidecode(correct_ans_no_nums_to_unicode)
 
 
 # Split each one of the two anwers into an array of words, processing one word at a time
@@ -146,6 +146,8 @@ for correct_ans_word in list_of_correct_ans_words_no_stops_pref:
 
 wordWeight = 1 / len(list_of_correct_ans_words_no_stops_pref_suf)
 
+print '\n'
+print 'Word weight: {0}'.format(wordWeight)
 
 # For each word in student answer, calculate the similarity with words in correct answer
 
@@ -167,6 +169,9 @@ for student_ans_word_idx in range(len(list_of_student_ans_words_no_stops_pref_su
 		# Insert the tuple into a list
 		list_of_lev_distances.append(lev_distance_tuple)
 
+print '\n'
+print 'List of Levenshtein distance:'
+print list_of_lev_distances
 
 # [2] Calculate the similarity score between every word in student answer and words in correct answer
 
@@ -190,5 +195,36 @@ for student_ans_word_idx in range(len(list_of_student_ans_words_no_stops_pref_su
 				# Insert the tuple into a list
 				list_of_sim_score.append(sim_score_tuple)
 
+				break
 
+print '\n'
+print 'List of Similarity score:'
+print list_of_sim_score
 
+# For each word in student answer, calculate the similarity with words in correct answer
+
+finalMark = 0
+
+# [1] If the similarity between StudentWord(i) and CorrectWord(i) = 1 then add weight to the final mark
+# [2] Elseif the similarity between StudentWord(i) and CorrectWord(i) < 1 and >= 0.96, add weight to the final mark
+# [3] Elseif the similarity between StudentWord(i) and CorrectWord(i) >= 0.8 and < 0.96, add half the weight to the final mark
+# [4] Elseif the similarity between StudentWord(i) and CorrectWord(i) < 0.8 then no weight is added to the final mark
+
+for student_ans_word_idx in range(len(list_of_student_ans_words_no_stops_pref_suf)):
+	for correct_ans_word_idx in range(len(list_of_correct_ans_words_no_stops_pref_suf)):
+
+		for sim_score in list_of_sim_score:
+			if sim_score[0] == student_ans_word_idx and sim_score[1] == correct_ans_word_idx:
+
+				if sim_score[2] == 1:
+					finalMark = finalMark + wordWeight
+				elif sim_score[2] >= 0.96 and sim_score[2] < 1:
+					finalMark = finalMark + wordWeight
+				elif sim_score[2] >= 0.8 and sim_score[2] < 0.96:
+					finalMark = finalMark + (wordWeight * 0.5)
+				else:
+					finalMark = finalMark
+
+				break
+
+print 'Final Mark: {0}'.format(finalMark)
