@@ -2,6 +2,7 @@
 # HEAVY STEMMING APPROACH
 
 from string import punctuation
+import editdistance
 import unidecode
 
 DATASET = 'docs'
@@ -44,6 +45,11 @@ def removeSuffix(text):
 
 	return text
     
+
+# Return the Levenshtein distance between two words
+def computeLevenshteinDistance(student_ans_word, correct_ans_word):
+	return editdistance.eval(student_ans_word, correct_ans_word)
+
 
 # Get both question and correct answer from the database
 with open(DATASET + '/questions') as f:
@@ -134,4 +140,23 @@ wordWeight = 1 / len(list_of_correct_ans_words_no_stops_pref_suf)
 
 
 # For each word in student answer, calculate the similarity with words in correct answer
+
+# [1] Calculate the Levenshtein distance between every word in student answer and words in correct answer
+
+list_of_lev_distances = []
+
+for student_ans_word_idx in range(len(list_of_student_ans_words_no_stops_pref_suf)):
+	for correct_ans_word_idx in range(len(list_of_correct_ans_words_no_stops_pref_suf)):
+		student_ans_word = list_of_student_ans_words_no_stops_pref_suf[student_ans_word_idx]
+		correct_ans_word = list_of_correct_ans_words_no_stops_pref_suf[correct_ans_word_idx]
+
+		# Compute the Levenshtein distance between student answer word and correct answer word
+		levenshtein_distance = computeLevenshteinDistance(student_ans_word, correct_ans_word)
+		
+		# Create the tuple specifying the index for the student and correct answer word as well as the Levenshtein distance
+		lev_distance_tuple = (student_ans_word_idx, correct_ans_word_idx, levenshtein_distance)
+
+		# Insert the tuple into a list
+		list_of_lev_distances.append(lev_distance_tuple)
+
 
