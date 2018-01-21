@@ -127,3 +127,11 @@ for correct_ans_word in list_of_correct_ans_words_no_stops_pref:
 	list_of_correct_ans_words_no_stops_pref_suf.append(new_word)
 
 
+# Find the similarities by giving a weight to each word in both answers
+# Formula: Word(i) weight = 1 / (total words in correct answer)
+
+wordWeight = 1 / len(list_of_correct_ans_words_no_stops_pref_suf)
+
+
+# For each word in student answer, calculate the similarity with words in correct answer
+
