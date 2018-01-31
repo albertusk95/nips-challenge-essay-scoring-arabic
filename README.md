@@ -2,7 +2,7 @@
 
 ## Global NIPS Paper Implementation Challenge
 
-I implemented the paper based on the used methodology
+I implemented the paper based on the research methodology
 
 ## Original Paper
 
