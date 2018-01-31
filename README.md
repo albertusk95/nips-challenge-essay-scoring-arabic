@@ -59,8 +59,8 @@ Some important files / directories:
 
 To run the program, execute the following command:
 <ul>
-  <li>Heavy stemming approach: _python heavy_stemming.py_</li>
-  <li>Light stemming approach: _python light_stemming.py_</li>
+  <li>Heavy stemming approach: <i>python heavy_stemming.py</i></li>
+  <li>Light stemming approach: <i>python light_stemming.py</i></li>
 </ul>
 
 ## Methodology
@@ -68,7 +68,7 @@ To run the program, execute the following command:
 Both approaches (heavy and light stemming) uses the following steps. The difference is only in the removal of prefixes and suffixes.
 
 <ul>
-  <li>Begin Heavy Stemming on both student and correct answers
+  <li><b>Begin Heavy Stemming on both student and correct answers</b>
     <p>
       This initial step consists of two sub-steps, such as removal of numbers from both answers and removal of diacritics from both answers. For the latter task, each answer is converted to unicode then the diacritics can be removed from both answers.
     </p>
@@ -76,7 +76,7 @@ Both approaches (heavy and light stemming) uses the following steps. The differe
       <img src="https://github.com/albertusk95/nips-challenge-essay-scoring-arabic/blob/master/assets/img/step_1_AES.png?raw=true"/>
     </p>
   </li>
-  <li>Split each one of the two anwers into an array of words, processing one word at a time
+  <li><b>Split each one of the two anwers into an array of words, processing one word at a time</b>
     <p>
       It includes several steps, such as removal of stopwords, removal of prefix if word length is greater than 3, and removal of suffix if word length is greater than 3.
     </p>
@@ -84,7 +84,7 @@ Both approaches (heavy and light stemming) uses the following steps. The differe
       <img src="https://github.com/albertusk95/nips-challenge-essay-scoring-arabic/blob/master/assets/img/step_2_AES.png?raw=true"/>
     </p>
   </li>
-  <li>Find the similarities by giving a weight to each word in both answers
+  <li><b>Find the similarities by giving a weight to each word in both answers</b>
     <p>
       The weight formula for each word:
       <i>Word(i) weight = 1 / (total words in correct answer)</i>
@@ -93,7 +93,7 @@ Both approaches (heavy and light stemming) uses the following steps. The differe
       <img src="https://github.com/albertusk95/nips-challenge-essay-scoring-arabic/blob/master/assets/img/step_4_AES.png?raw=true"/>
     </p>
   </li>
-  <li>For each word in student answer, calculate the similarity with words in correct answer
+  <li><b>For each word in student answer, calculate the similarity with words in correct answer</b>
     <p>
       Several steps were included, such as calculating the Levenshtein distance between every word in student answer and words in correct answer AND calculating the similarity score between every word in student answer and words in correct answer.
     </p>
@@ -107,7 +107,7 @@ Both approaches (heavy and light stemming) uses the following steps. The differe
       <img src="https://github.com/albertusk95/nips-challenge-essay-scoring-arabic/blob/master/assets/img/step_6_AES.png?raw=true"/>
     </p>
   </li>
-  <li>For each word in student answer, calculate the similarity with words in correct answer
+  <li><b>For each word in student answer, calculate the similarity with words in correct answer</b>
     <p>
       These are the rules for calculating the final mark:
       <ul>
